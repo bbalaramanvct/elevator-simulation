@@ -1,0 +1,9 @@
+time,passenger_id,start_floor,destination_floor
+0,S1,2,7
+5,S2,4,9
+10,S3,1,6
+15,S4,8,3
+20,S5,0,5
+25,S6,6,10
+30,S7,3,8
+35,S8,9,2

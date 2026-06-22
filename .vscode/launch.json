@@ -1,0 +1,113 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Elevator Sim: All algorithms (sample data)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "data/sample_requests.csv",
+        "--max-floor",
+        "10",
+        "--algorithms",
+        "all"
+      ]
+    },
+    {
+      "name": "Elevator Sim: All + rush-hour SCAN",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "data/sample_requests.csv",
+        "--max-floor",
+        "10",
+        "--algorithms",
+        "all",
+        "--rush-hour-scan"
+      ]
+    },
+    {
+      "name": "Elevator Sim: SCAN only",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "data/sample_requests.csv",
+        "--max-floor",
+        "10",
+        "--algorithms",
+        "scan"
+      ]
+    },
+    {
+      "name": "Elevator Sim: Rush-hour adaptive",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "data/sample_requests.csv",
+        "--max-floor",
+        "10",
+        "--algorithms",
+        "rush_hour"
+      ]
+    },
+    {
+      "name": "Elevator Sim: Custom CSV (edit args)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "data/sample_requests.csv",
+        "--max-floor",
+        "10",
+        "--elevators",
+        "3",
+        "--capacity",
+        "8",
+        "--output-dir",
+        "output",
+        "--algorithms",
+        "nearest_car",
+        "scan"
+      ]
+    {
+      "name": "Benchmarks + dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_benchmarks.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": ["--visualize", "--open"]
+    },
+    {
+      "name": "Visualize: benchmark dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/visualize.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "--benchmark-csv",
+        "output/benchmarks/benchmark_comparison.csv",
+        "--position-csv",
+        "output/elevator_positions_nearest_car.csv",
+        "--max-floor",
+        "51",
+        "--open"
+      ]
+    }
+  ]
+}
