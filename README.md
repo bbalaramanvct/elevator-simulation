@@ -34,6 +34,7 @@ elevator-simulation/
     ├── validator.py                 # Input validation
     ├── simulation.py                # Discrete-time engine
     ├── stats.py                     # Result aggregation
+    ├── visualize.py                 # Visual stats
     ├── models/
     │   ├── elevator.py
     │   └── passenger.py
@@ -238,7 +239,7 @@ Open [elevator-benchmarks](C:\Users\bvchi\.cursor\projects\c-Users-bvchi-Project
 
 ### Using MCP in Cursor
 
-Visualization can be enhanced with Cursor MCP servers:
+Visualization has been enhanced with Cursor MCP servers:
 
 | MCP server | How it helps |
 |------------|--------------|
@@ -253,26 +254,30 @@ Example agent workflow:
 
 MCP does not replace the Python visualizer — it **surfaces** the generated HTML in Cursor's UI. For repeatable charts in CI, use `--png` or the CSV output.
 
-## Simulation Model
+# Time taken to finish
+
+3 hours approximately
+
+## Assumptions Made
 
 1. At each time step `t`, new requests with `time == t` are assigned to an elevator immediately.
 2. Each elevator moves at most one floor per tick toward its next stop.
 3. When an elevator reaches a stop floor, passengers alight and board (instantaneous).
 4. A passenger's destination cannot change after assignment.
 5. Elevators respect capacity limits; full cars skip additional pickups.
+6. Rush-hour windows use **local system time** at program start (end exclusive):
 
-## Suggested Improvements
+- 08:00–10:00
+- 12:00–13:00
+- 16:00–18:00
 
-1. **LOOK algorithm**: reverse at the highest/lowest requested floor instead of the building end.
-2. **Door dwell time**: model a fixed number of ticks for boarding and alighting instead of instantaneous service.
-3. **Priority requests**: support emergency or accessibility-priority passengers.
-4. **Dynamic rebalancing**: idle elevators reposition to high-traffic floors during quiet periods.
-5. **Peak/off-peak profiles**: load request patterns from historical CSV datasets for stress testing.
-6. **Visualization**: implemented via `visualize.py`, HTML dashboards, optional PNG, and Cursor Canvas.
-7. **Multi-objective scoring**: compare algorithms on fairness metrics (e.g. max wait time) in addition to averages.
-8. **Configurable cost functions**: let nearest-car use weighted costs for wait time vs. energy use.
-9. **Unit tests**: pytest coverage in `tests/test_algorithm_evaluation.py` for benchmark scenarios.
-10. **Batch comparison mode**: implemented via `run_benchmarks.py`.
+## Planned Improvements
+
+1. **Priority requests**: support emergency or accessibility-priority passengers.
+2. **Dynamic rebalancing**: idle elevators reposition to high-traffic floors during quiet periods.
+3. **Peak/off-peak profiles**: load request patterns from historical CSV datasets for stress testing.
+4. **Multi-objective scoring**: compare algorithms on fairness metrics (e.g. max wait time) in addition to averages.
+5. **Configurable cost functions**: let nearest-car use weighted costs for wait time vs. energy use.
 
 ## License
 
