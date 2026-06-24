@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elevator Benchmark Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --grid: #30363d;
+      --c0: #58a6ff;
+      --c1: #3fb950;
+      --c2: #d29922;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--grid);
+    }
+    h1 { margin: 0 0 0.25rem; font-size: 1.35rem; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; }
+    main { padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    label { color: var(--muted); font-size: 0.85rem; }
+    select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--grid);
+      padding: 0.45rem 0.65rem;
+      border-radius: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--grid);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .card h2 { margin: 0 0 0.35rem; font-size: 1rem; }
+    .card p { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.85rem; }
+    canvas { width: 100%; height: 220px; display: block; }
+    .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; font-size: 0.8rem; }
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 0.35rem;
+    }
+    .scatter-wrap canvas { height: 360px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.45rem 0.5rem;
+      border-bottom: 1px solid var(--grid);
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .best { color: #3fb950; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Elevator Algorithm Benchmark Dashboard</h1>
+    <p class="subtitle">Source: benchmark_comparison.csv · metrics in discrete time units (ticks)</p>
+  </header>
+  <main>
+    <div class="controls">
+      <label for="scenario">Scenario
+        <select id="scenario"></select>
+      </label>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h2>Average total time (efficiency)</h2>
+        <p id="scenario-desc"></p>
+        <canvas id="chart-total"></canvas>
+        <div class="legend">
+          <span style="--swatch:var(--c0)">nearest_car</span>
+          <span style="--swatch:var(--c1)">round_robin</span>
+          <span style="--swatch:var(--c2)">scan</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Max wait time (fairness)</h2>
+        <p>Worst passenger wait per algorithm — lower is fairer.</p>
+        <canvas id="chart-wait"></canvas>
+      </div>
+    </div>
+    <div class="card scatter-wrap" style="margin-top:1rem;">
+      <h2>Fairness vs efficiency (all scenarios)</h2>
+      <p>Each point is one algorithm in one scenario. Bottom-left is best.</p>
+      <canvas id="chart-scatter"></canvas>
+    </div>
+    <div class="card" style="margin-top:1rem;">
+      <h2>Winners by scenario</h2>
+      <table id="winners">
+        <thead>
+          <tr><th>Scenario</th><th>Best efficiency</th><th>Best fairness</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+  <script>
+    const DATA = {"scenarios": {"morning_rush": {"description": "10 passengers request ground-to-upper floors at t=0-1 (peak up-traffic).", "algorithms": {"nearest_car": {"avg_wait": 3.2, "max_wait": 27, "wait_spread": 27, "avg_total": 13.4, "final_time": 39}, "round_robin": {"avg_wait": 3.3, "max_wait": 27, "wait_spread": 27, "avg_total": 13.5, "final_time": 35}, "scan": {"avg_wait": 3.2, "max_wait": 27, "wait_spread": 27, "avg_total": 13.4, "final_time": 39}}}, "evening_rush": {"description": "10 passengers request upper-to-ground floors at t=0-1 (peak down-traffic).", "algorithms": {"nearest_car": {"avg_wait": 18.4, "max_wait": 45, "wait_spread": 35, "avg_total": 35.1, "final_time": 60}, "round_robin": {"avg_wait": 12.4, "max_wait": 15, "wait_spread": 5, "avg_total": 28.1, "final_time": 30}, "scan": {"avg_wait": 18.4, "max_wait": 45, "wait_spread": 35, "avg_total": 35.1, "final_time": 60}}}, "sparse_traffic": {"description": "Requests evenly spaced every 5 ticks; low concurrent load.", "algorithms": {"nearest_car": {"avg_wait": 3.25, "max_wait": 8, "wait_spread": 8, "avg_total": 8.38, "final_time": 43}, "round_robin": {"avg_wait": 3.0, "max_wait": 7, "wait_spread": 7, "avg_total": 8.12, "final_time": 43}, "scan": {"avg_wait": 3.25, "max_wait": 8, "wait_spread": 8, "avg_total": 8.38, "final_time": 43}}}, "bursty_traffic": {"description": "Three bursts of 3-4 requests at t=0, 10, and 20.", "algorithms": {"nearest_car": {"avg_wait": 1.5, "max_wait": 5, "wait_spread": 5, "avg_total": 9.9, "final_time": 35}, "round_robin": {"avg_wait": 1.7, "max_wait": 4, "wait_spread": 4, "avg_total": 10.1, "final_time": 34}, "scan": {"avg_wait": 3.5, "max_wait": 9, "wait_spread": 9, "avg_total": 13.3, "final_time": 41}}}, "fairness_outlier": {"description": "Six bulk up-requests plus one outlier to floor 25 at t=0.", "algorithms": {"nearest_car": {"avg_wait": 0.0, "max_wait": 0, "wait_spread": 0, "avg_total": 12.14, "final_time": 25}, "round_robin": {"avg_wait": 0.0, "max_wait": 0, "wait_spread": 0, "avg_total": 12.14, "final_time": 25}, "scan": {"avg_wait": 0.0, "max_wait": 0, "wait_spread": 0, "avg_total": 12.14, "final_time": 25}}}, "bidirectional": {"description": "Mixed up and down requests arriving together.", "algorithms": {"nearest_car": {"avg_wait": 6.0, "max_wait": 12, "wait_spread": 12, "avg_total": 16.0, "final_time": 24}, "round_robin": {"avg_wait": 6.0, "max_wait": 12, "wait_spread": 12, "avg_total": 16.0, "final_time": 24}, "scan": {"avg_wait": 6.0, "max_wait": 12, "wait_spread": 12, "avg_total": 16.0, "final_time": 24}}}, "high_rise": {"description": "Six passengers in a 50-floor building with long travel distances.", "algorithms": {"nearest_car": {"avg_wait": 6.17, "max_wait": 15, "wait_spread": 15, "avg_total": 56.83, "final_time": 100}, "round_robin": {"avg_wait": 20.83, "max_wait": 85, "wait_spread": 85, "avg_total": 69.83, "final_time": 125}, "scan": {"avg_wait": 6.17, "max_wait": 15, "wait_spread": 15, "avg_total": 56.83, "final_time": 100}}}, "capacity_stress": {"description": "12 simultaneous requests with 2 elevators and capacity 4.", "algorithms": {"nearest_car": {"avg_wait": 17.92, "max_wait": 37, "wait_spread": 37, "avg_total": 25.92, "final_time": 46}, "round_robin": {"avg_wait": 6.08, "max_wait": 18, "wait_spread": 18, "avg_total": 12.92, "final_time": 26}, "scan": {"avg_wait": 17.92, "max_wait": 37, "wait_spread": 37, "avg_total": 25.92, "final_time": 46}}}}};
+    const ALGS = ["nearest_car", "round_robin", "scan"];
+    const COLORS = ["#58a6ff", "#3fb950", "#d29922"];
+    const scenarioSelect = document.getElementById("scenario");
+    const names = Object.keys(DATA.scenarios).sort();
+
+    names.forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      scenarioSelect.appendChild(opt);
+    });
+
+    function drawBars(canvasId, metric, title) {
+      const scenario = scenarioSelect.value;
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      const w = rect.width, h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+      const values = ALGS.map(a => DATA.scenarios[scenario].algorithms[a][metric]);
+      const maxV = Math.max(...values, 1) * 1.15;
+      const pad = { l: 40, r: 16, t: 16, b: 36 };
+      const chartW = w - pad.l - pad.r;
+      const chartH = h - pad.t - pad.b;
+      const barW = chartW / ALGS.length * 0.55;
+      ALGS.forEach((alg, i) => {
+        const v = values[i];
+        const x = pad.l + (i + 0.5) * (chartW / ALGS.length) - barW / 2;
+        const barH = (v / maxV) * chartH;
+        const y = pad.t + chartH - barH;
+        ctx.fillStyle = COLORS[i];
+        ctx.fillRect(x, y, barW, barH);
+        ctx.fillStyle = "#8b949e";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(v.toFixed(1), x + barW / 2, y - 4);
+        ctx.fillText(alg.replace("_", " "), x + barW / 2, h - 12);
+      });
+      ctx.strokeStyle = "#30363d";
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t + chartH);
+      ctx.lineTo(w - pad.r, pad.t + chartH);
+      ctx.stroke();
+    }
+
+    function drawScatter() {
+      const canvas = document.getElementById("chart-scatter");
+      const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      const w = rect.width, h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+      const pad = { l: 48, r: 16, t: 16, b: 44 };
+      const points = [];
+      names.forEach(sname => {
+        ALGS.forEach((alg, i) => {
+          const a = DATA.scenarios[sname].algorithms[alg];
+          points.push({ x: a.avg_total, y: a.max_wait, alg, sname, color: COLORS[i] });
+        });
+      });
+      const maxX = Math.max(...points.map(p => p.x)) * 1.1;
+      const maxY = Math.max(...points.map(p => p.y)) * 1.1;
+      const chartW = w - pad.l - pad.r;
+      const chartH = h - pad.t - pad.b;
+      points.forEach(p => {
+        const x = pad.l + (p.x / maxX) * chartW;
+        const y = pad.t + chartH - (p.y / maxY) * chartH;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.fillStyle = "#8b949e";
+      ctx.font = "12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Avg total time (ticks)", pad.l + chartW / 2, h - 8);
+      ctx.save();
+      ctx.translate(14, pad.t + chartH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Max wait (ticks)", 0, 0);
+      ctx.restore();
+      ctx.strokeStyle = "#30363d";
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t + chartH);
+      ctx.lineTo(w - pad.r, pad.t + chartH);
+      ctx.moveTo(pad.l, pad.t);
+      ctx.lineTo(pad.l, pad.t + chartH);
+      ctx.stroke();
+    }
+
+    function fillWinners() {
+      const tbody = document.querySelector("#winners tbody");
+      tbody.innerHTML = "";
+      names.forEach(name => {
+        const algs = DATA.scenarios[name].algorithms;
+        let bestEff = ALGS[0], bestFair = ALGS[0];
+        ALGS.forEach(a => {
+          if (algs[a].avg_total < algs[bestEff].avg_total) bestEff = a;
+          if (algs[a].max_wait < algs[bestFair].max_wait) bestFair = a;
+        });
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${name}</td><td class="best">${bestEff}</td><td class="best">${bestFair}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function refresh() {
+      document.getElementById("scenario-desc").textContent =
+        DATA.scenarios[scenarioSelect.value].description;
+      drawBars("chart-total", "avg_total");
+      drawBars("chart-wait", "max_wait");
+      drawScatter();
+      fillWinners();
+    }
+
+    scenarioSelect.addEventListener("change", refresh);
+    window.addEventListener("resize", refresh);
+    refresh();
+  </script>
+</body>
+</html>

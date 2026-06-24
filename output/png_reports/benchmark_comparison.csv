@@ -1,0 +1,41 @@
+scenario,description,algorithm,avg_wait,max_wait,min_wait,wait_spread,wait_std_dev,avg_total,max_total,min_total,total_spread,final_time,num_passengers
+morning_rush,10 passengers request ground-to-upper floors at t=0-1 (peak up-traffic).,nearest_car,3.20,27,0,27,7.96,13.40,38,7,31,39,10
+morning_rush,10 passengers request ground-to-upper floors at t=0-1 (peak up-traffic).,round_robin,3.30,27,0,27,7.93,13.50,34,8,26,35,10
+morning_rush,10 passengers request ground-to-upper floors at t=0-1 (peak up-traffic).,rush_hour_nearest_car,3.20,27,0,27,7.96,13.40,38,7,31,39,10
+morning_rush,10 passengers request ground-to-upper floors at t=0-1 (peak up-traffic).,rush_hour_scan_0800-1000,3.20,27,0,27,7.96,13.40,38,7,31,39,10
+morning_rush,10 passengers request ground-to-upper floors at t=0-1 (peak up-traffic).,scan,3.20,27,0,27,7.96,13.40,38,7,31,39,10
+evening_rush,10 passengers request upper-to-ground floors at t=0-1 (peak down-traffic).,nearest_car,18.40,45,10,35,13.36,35.10,60,27,33,60,10
+evening_rush,10 passengers request upper-to-ground floors at t=0-1 (peak down-traffic).,round_robin,12.40,15,10,5,1.80,28.10,30,26,4,30,10
+evening_rush,10 passengers request upper-to-ground floors at t=0-1 (peak down-traffic).,rush_hour_nearest_car,18.40,45,10,35,13.36,35.10,60,27,33,60,10
+evening_rush,10 passengers request upper-to-ground floors at t=0-1 (peak down-traffic).,rush_hour_scan_0800-1000,18.40,45,10,35,13.36,35.10,60,27,33,60,10
+evening_rush,10 passengers request upper-to-ground floors at t=0-1 (peak down-traffic).,scan,18.40,45,10,35,13.36,35.10,60,27,33,60,10
+sparse_traffic,Requests evenly spaced every 5 ticks; low concurrent load.,nearest_car,3.25,8,0,8,2.59,8.38,13,4,9,43,8
+sparse_traffic,Requests evenly spaced every 5 ticks; low concurrent load.,round_robin,3.00,7,0,7,2.35,8.12,12,5,7,43,8
+sparse_traffic,Requests evenly spaced every 5 ticks; low concurrent load.,rush_hour_nearest_car,3.25,8,0,8,2.59,8.38,13,4,9,43,8
+sparse_traffic,Requests evenly spaced every 5 ticks; low concurrent load.,rush_hour_scan_0800-1000,3.25,8,0,8,2.59,8.38,13,4,9,43,8
+sparse_traffic,Requests evenly spaced every 5 ticks; low concurrent load.,scan,3.25,8,0,8,2.59,8.38,13,4,9,43,8
+bursty_traffic,"Three bursts of 3-4 requests at t=0, 10, and 20.",nearest_car,1.50,5,0,5,1.50,9.90,15,8,7,35,10
+bursty_traffic,"Three bursts of 3-4 requests at t=0, 10, and 20.",round_robin,1.70,4,0,4,1.42,10.10,14,7,7,34,10
+bursty_traffic,"Three bursts of 3-4 requests at t=0, 10, and 20.",rush_hour_nearest_car,1.50,5,0,5,1.50,9.90,15,8,7,35,10
+bursty_traffic,"Three bursts of 3-4 requests at t=0, 10, and 20.",rush_hour_scan_0800-1000,3.50,9,0,9,3.32,13.30,21,8,13,41,10
+bursty_traffic,"Three bursts of 3-4 requests at t=0, 10, and 20.",scan,3.50,9,0,9,3.32,13.30,21,8,13,41,10
+fairness_outlier,Six bulk up-requests plus one outlier to floor 25 at t=0.,nearest_car,0.00,0,0,0,0.00,12.14,25,10,15,25,7
+fairness_outlier,Six bulk up-requests plus one outlier to floor 25 at t=0.,round_robin,0.00,0,0,0,0.00,12.14,25,10,15,25,7
+fairness_outlier,Six bulk up-requests plus one outlier to floor 25 at t=0.,rush_hour_nearest_car,0.00,0,0,0,0.00,12.14,25,10,15,25,7
+fairness_outlier,Six bulk up-requests plus one outlier to floor 25 at t=0.,rush_hour_scan_0800-1000,0.00,0,0,0,0.00,12.14,25,10,15,25,7
+fairness_outlier,Six bulk up-requests plus one outlier to floor 25 at t=0.,scan,0.00,0,0,0,0.00,12.14,25,10,15,25,7
+bidirectional,Mixed up and down requests arriving together.,nearest_car,6.00,12,0,12,4.36,16.00,24,7,17,24,8
+bidirectional,Mixed up and down requests arriving together.,round_robin,6.00,12,0,12,4.36,16.00,24,7,17,24,8
+bidirectional,Mixed up and down requests arriving together.,rush_hour_nearest_car,6.00,12,0,12,4.36,16.00,24,7,17,24,8
+bidirectional,Mixed up and down requests arriving together.,rush_hour_scan_0800-1000,6.00,12,0,12,4.36,16.00,24,7,17,24,8
+bidirectional,Mixed up and down requests arriving together.,scan,6.00,12,0,12,4.36,16.00,24,7,17,24,8
+high_rise,Six passengers in a 50-floor building with long travel distances.,nearest_car,6.17,15,0,15,5.58,56.83,92,35,57,100,6
+high_rise,Six passengers in a 50-floor building with long travel distances.,round_robin,20.83,85,0,85,29.20,69.83,119,40,79,125,6
+high_rise,Six passengers in a 50-floor building with long travel distances.,rush_hour_nearest_car,6.17,15,0,15,5.58,56.83,92,35,57,100,6
+high_rise,Six passengers in a 50-floor building with long travel distances.,rush_hour_scan_0800-1000,6.17,15,0,15,5.58,56.83,92,35,57,100,6
+high_rise,Six passengers in a 50-floor building with long travel distances.,scan,6.17,15,0,15,5.58,56.83,92,35,57,100,6
+capacity_stress,12 simultaneous requests with 2 elevators and capacity 4.,nearest_car,17.92,37,0,37,15.02,25.92,46,5,41,46,12
+capacity_stress,12 simultaneous requests with 2 elevators and capacity 4.,round_robin,6.08,18,0,18,7.75,12.92,26,5,21,26,12
+capacity_stress,12 simultaneous requests with 2 elevators and capacity 4.,rush_hour_nearest_car,17.92,37,0,37,15.02,25.92,46,5,41,46,12
+capacity_stress,12 simultaneous requests with 2 elevators and capacity 4.,rush_hour_scan_0800-1000,17.92,37,0,37,15.02,25.92,46,5,41,46,12
+capacity_stress,12 simultaneous requests with 2 elevators and capacity 4.,scan,17.92,37,0,37,15.02,25.92,46,5,41,46,12
